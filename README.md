@@ -1,7 +1,76 @@
 
-# Welcome to your CDK Python project!
+# Welcome to Panorama CDK Python project!
 
-This is a blank project for Python development with CDK.
+This project is WIP.
+
+
+This is a set of tools to create the infrastructure needed for Panorama to run.
+For more information about Panorama, please visit [https://aulasneo.com/en/panorama-analytics](https://aulasneo.com/en/panorama-analytics)
+
+---
+
+## How to get data from Open edX
+
+### Tracking logs
+
+Run the following command from CLI or add to a cron job:
+```shell script
+/usr/local/bin/aws s3 sync /edx/var/log/tracking/ s3://aulasneo-edxdata/logs/$LMS_BASE
+```
+
+### MySQL tables
+
+Needs to be improved:
+
+```shell script
+TABLES="auth_user\
+ student_courseenrollment\
+ auth_userprofile\
+ student_courseaccessrole\
+ course_overviews_courseoverview\
+ courseware_studentmodule\
+ grades_persistentcoursegrade\
+ student_manualenrollmentaudit\
+ student_courseenrollmentallowed\
+ certificates_generatedcertificate"
+
+for TABLE in ${TABLES}
+do
+    LMSDIR="${REPORTDIR}/${TABLE}/lms=${LMS}"
+
+    mkdir -p ${LMSDIR}
+
+    REPORTFILE=${TABLE}.csv
+    mysql -u root -b edxapp -e "SELECT * FROM ${TABLE};" | ${SCRIPTDIR=}/tab2csv.py > "${LMSDIR}/${REPORTFILE}"
+
+done
+
+/usr/local/bin/aws s3 sync ${REPORTDIR} ${REPORTBUCKET}
+
+```
+
+To convert mysql output to csv tab2csv.py:
+
+```python
+#!/usr/bin/env python
+
+import csv
+import sys
+
+
+tab_in = csv.reader(sys.stdin, dialect=csv.excel_tab)
+comma_out = csv.writer(sys.stdout, delimiter=',', doublequote=False, escapechar='\\')
+
+for row in tab_in:
+    comma_out.writerow(row)
+
+```
+
+---
+
+# Text bellow this line comes from the original CDK readme file
+
+---
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
