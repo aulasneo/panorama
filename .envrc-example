@@ -1,0 +1,4 @@
+# (optional) export VIRTUAL_ENV="$(pwd)/.env"
+# (otionap) layout python-venv
+
+export AWS_DEFAULT_REGION="YOU_REGION"
