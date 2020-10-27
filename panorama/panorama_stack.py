@@ -1,5 +1,4 @@
-from aws_cdk import core
-from aws_cdk import aws_s3 as s3
+from aws_cdk import core, aws_s3 as s3, aws_lambda as _lambda
 
 
 class PanoramaStack(core.Stack):
@@ -20,12 +19,22 @@ class PanoramaStack(core.Stack):
             self, "-processed-logs-", removal_policy=core.RemovalPolicy.DESTROY
         )
 
-        #
+        # TODO: Change destination bucket in the lambda function
+        process_logs_lambda = _lambda.Function(
+            self,
+            "ProcessLogs",
+            runtime=_lambda.Runtime.PYTHON_3_7,
+            code=_lambda.Code.asset("lambda"),
+            handler="process_logs.handler",
+            environment={"PROCESSED_LOGS_BUCKET": processed_logs_bucket.node.unique_id},
+        )
 
-        # TODO: Create the lambda function to process logs
+        data_bucket.add_event_notification(
+            event=s3.EventType.OBJECT_CREATED, dest=process_logs_lambda
+        )
 
         # TODO: Create the datalake DB in lake formation
-        db_name = id + "-db"
+        # db_name = id + "-db"
         # Check Upgrading AWS Glue Data Permissions to the AWS Lake Formation Model: https://docs.aws.amazon.com/lake-formation/latest/dg/upgrade-glue-lake-formation.html
 
         # TODO: Create Glue crawlers
