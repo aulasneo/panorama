@@ -1,4 +1,5 @@
 from aws_cdk import core
+from aws_cdk import aws_s3 as s3
 
 
 class PanoramaStack(core.Stack):
@@ -7,19 +8,24 @@ class PanoramaStack(core.Stack):
 
         # The code that defines your stack goes here
 
-        account_id = self.account
-        data_bucket_name = "Panorama-" + account_id + "-data"
-        processed_logs_bucket_name = data_bucket_name + "-processed_logs"
-
         # TODO: Create S3 2 buckets:
-        # data_bucket_name
+        # RemovalPolicy should be left to the default RETAIN in production to
+        # avoid any data loss. S3 buckets should be manually deleted.
 
-        # processed_logs_bucket_name
+        data_bucket = s3.Bucket(
+            self, "-data-", removal_policy=core.RemovalPolicy.DESTROY
+        )
+
+        processed_logs_bucket = s3.Bucket(
+            self, "-processed-logs-", removal_policy=core.RemovalPolicy.DESTROY
+        )
+
+        #
 
         # TODO: Create the lambda function to process logs
 
         # TODO: Create the datalake DB in lake formation
-        db_name = "Panorama-" + account_id + "-db"
+        db_name = id + "-db"
         # Check Upgrading AWS Glue Data Permissions to the AWS Lake Formation Model: https://docs.aws.amazon.com/lake-formation/latest/dg/upgrade-glue-lake-formation.html
 
         # TODO: Create Glue crawlers
@@ -47,4 +53,4 @@ class PanoramaStack(core.Stack):
 
         # TODO: Create Quicksight basic reports
 
-        core.CfnOutput(self, "{}-account".format(id), value=self.account)
+        core.CfnOutput(self, "{}-unique-id".format(id), value=self.node.unique_id)
