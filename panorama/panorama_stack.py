@@ -7,12 +7,13 @@ class PanoramaStack(core.Stack):
 
         # The code that defines your stack goes here
 
-        account_id = "function to get the account id"
+        account_id = self.account
         data_bucket_name = "Panorama-" + account_id + "-data"
         processed_logs_bucket_name = data_bucket_name + "-processed_logs"
 
         # TODO: Create S3 2 buckets:
         # data_bucket_name
+
         # processed_logs_bucket_name
 
         # TODO: Create the lambda function to process logs
@@ -45,3 +46,5 @@ class PanoramaStack(core.Stack):
         # TODO: Create Athena link to datalake
 
         # TODO: Create Quicksight basic reports
+
+        core.CfnOutput(self, "{}-account".format(id), value=self.account)
